@@ -1,6 +1,14 @@
-let noButtonSize = 100;
-let yesButtonSize = 100;
+// Constants and state
+const INITIAL_BUTTON_SIZE = 100;
+const MAX_YES_BUTTON_SIZE = 500;
+const BUTTON_SHRINK_RATE = 10;
+const PADDING = 50;
+
+let noButtonSize = INITIAL_BUTTON_SIZE;
+let yesButtonSize = INITIAL_BUTTON_SIZE;
 let noClickCount = 0;
+
+// Messages for each "no" click
 const messages = [
   "Du bomma på ja",
   "Oi, du var dårlig til å trykke på ja",
@@ -14,18 +22,13 @@ const messages = [
   "Kanskje prøv den store røde knappen i stedet? 🤔",
 ];
 
+// Visual effects functions
 function updateEffects() {
   const yesBtn = document.getElementById("yesBtn");
-
-  // Remove all previous glow classes
   yesBtn.classList.remove("glow-1", "glow-2", "glow-3", "glow-4");
+  clearArrows();
 
-  // Remove existing arrows
-  document.querySelectorAll(".arrow").forEach((arrow) => arrow.remove());
-
-  // Add effects based on click count
   if (noClickCount >= 4) {
-    // Maximum effects with shaking arrows
     yesBtn.classList.add("glow-4");
     addArrow("left", true);
     addArrow("right", true);
@@ -52,80 +55,132 @@ function addArrow(direction, shouldPulse = false) {
   arrow.className = `arrow arrow-${direction}`;
   if (shouldPulse) arrow.classList.add("pulse");
 
-  // Scale arrow size based on noClickCount (starting from size 40px)
   const baseSize = 40;
   const size = baseSize + noClickCount * 10;
   arrow.style.fontSize = `${size}px`;
-
   arrow.innerHTML = direction === "left" ? "→" : "←";
 
   yesBtn.parentNode.appendChild(arrow);
   requestAnimationFrame(() => arrow.classList.add("show"));
 }
 
-function rejected() {
-  noClickCount++;
-  noButtonSize -= 10;
-  yesButtonSize = Math.min(yesButtonSize + 10, 500);
-
-  const noBtn = document.getElementById("noBtn");
-  const yesBtn = document.getElementById("yesBtn");
-
-  // Keep the yes button growing from its original position
-  yesBtn.style.transform = `scale(${yesButtonSize / 100})`;
-
-  // Update effects based on click count
-  updateEffects();
-
-  // Get viewport dimensions instead of container
-  const maxX = window.innerWidth - noBtn.offsetWidth;
-  const maxY = window.innerHeight - noBtn.offsetHeight;
-
-  // Keep button within viewport bounds with some padding
-  const padding = 50;
-  const randomX = Math.random() * (maxX - 2 * padding) + padding;
-  const randomY = Math.random() * (maxY - 2 * padding) + padding;
-
-  noBtn.style.position = "fixed";
-  noBtn.style.transform = `scale(${noButtonSize / 100}) rotate(${
-    noClickCount * 10
-  }deg)`;
-  noBtn.style.left = `${randomX}px`;
-  noBtn.style.top = `${randomY}px`;
-
-  showMessage();
+function clearArrows() {
+  document.querySelectorAll(".arrow").forEach((arrow) => arrow.remove());
 }
 
+// Message handling
 function showMessage() {
   const existingMessage = document.querySelector(".message-popup");
   if (existingMessage) existingMessage.remove();
 
+  // Create a wrapper div for Totoro and message if it doesn't exist
+  let totoroWrapper = document.querySelector(".totoro-wrapper");
+  if (!totoroWrapper) {
+    totoroWrapper = document.createElement("div");
+    totoroWrapper.className = "totoro-wrapper";
+    totoroWrapper.style.position = "relative";
+
+    // Get the Totoro image and wrap it
+    const totoro = document.getElementById("normalTotoro");
+    const totoroParent = totoro.parentElement;
+    totoroWrapper.appendChild(totoro);
+    totoroParent.appendChild(totoroWrapper);
+  }
+
+  // Create and add message
   const message = document.createElement("div");
   message.className = "message-popup";
   message.textContent =
     messages[Math.min(noClickCount - 1, messages.length - 1)];
+  totoroWrapper.appendChild(message);
 
-  // Add to container instead of Totoro image
-  document.querySelector(".container").appendChild(message);
-
-  // Force a reflow before adding the show class
   message.offsetHeight;
   message.classList.add("show");
 
   setTimeout(() => {
     message.classList.remove("show");
-    setTimeout(() => message.remove(), 300);
+    setTimeout(() => {
+      // Only remove the message, keep the wrapper
+      message.remove();
+    }, 300);
   }, 2000);
 }
 
+// Button event handlers
+function rejected() {
+  noClickCount++;
+  noButtonSize -= BUTTON_SHRINK_RATE;
+  yesButtonSize = Math.min(
+    yesButtonSize + BUTTON_SHRINK_RATE,
+    MAX_YES_BUTTON_SIZE
+  );
+
+  const noBtn = document.getElementById("noBtn");
+  const yesBtn = document.getElementById("yesBtn");
+
+  updateYesButton(yesBtn);
+  updateNoButton(noBtn);
+  updateEffects();
+  showMessage();
+}
+
 function accepted() {
-  // Remove effects when accepted
-  document.querySelectorAll(".arrow").forEach((arrow) => arrow.remove());
+  clearArrows();
   document.getElementById("yesBtn").classList.remove("highlight");
 
+  // Remove any existing messages
+  const existingMessage = document.querySelector(".message-popup");
+  if (existingMessage) existingMessage.remove();
+
+  // Create wrapper for happy Totoro and message
+  const totoroWrapper = document.createElement("div");
+  totoroWrapper.style.position = "relative";
+
+  // Get and wrap happy Totoro
+  const happyTotoro = document.getElementById("happyTotoro");
+  const totoroParent = happyTotoro.parentElement;
+  totoroWrapper.appendChild(happyTotoro);
+
+  // Create permanent message
+  const message = document.createElement("div");
+  message.className = "message-popup permanent show";
+  message.textContent = "YAY! Send nudes! 🎉❤️";
+  totoroWrapper.appendChild(message);
+
+  // Update display
   document.getElementById("normalTotoro").classList.add("hidden");
-  document.getElementById("happyTotoro").classList.remove("hidden");
-  document.getElementById("acceptedMessage").classList.remove("hidden");
+  happyTotoro.classList.remove("hidden");
   document.querySelector(".buttons").classList.add("hidden");
   document.querySelector(".question").classList.add("hidden");
+
+  // Add wrapper to container
+  totoroParent.appendChild(totoroWrapper);
+}
+
+// Button update functions
+function updateYesButton(yesBtn) {
+  yesBtn.style.transform = `scale(${yesButtonSize / 100})`;
+}
+
+function updateNoButton(noBtn) {
+  const { randomX, randomY } = getRandomPosition(noBtn);
+
+  // Only set fixed position when we start moving the button
+  noBtn.style.position = "fixed";
+  noBtn.style.zIndex = "9999"; // Add z-index when it starts moving
+  noBtn.style.transform = `scale(${noButtonSize / 100}) rotate(${
+    noClickCount * 10
+  }deg)`;
+  noBtn.style.left = `${randomX}px`;
+  noBtn.style.top = `${randomY}px`;
+}
+
+function getRandomPosition(element) {
+  const maxX = window.innerWidth - element.offsetWidth;
+  const maxY = window.innerHeight - element.offsetHeight;
+
+  return {
+    randomX: Math.random() * (maxX - 2 * PADDING) + PADDING,
+    randomY: Math.random() * (maxY - 2 * PADDING) + PADDING,
+  };
 }

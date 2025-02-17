@@ -8,26 +8,27 @@
   </head>
   <body>
     <div class="container">
-      <img
-        src="images/totoro-normal.jpg"
-        alt="Totoro"
-        class="image"
-        id="normalTotoro"
-      />
-      <img
-        src="images/totoro-happy.jpg"
-        alt="Happy Totoro"
-        class="image hidden"
-        id="happyTotoro"
-      />
+      <div class="totoro-section">
+        <img
+          src="images/totoro-normal.jpg"
+          alt="Totoro"
+          class="image"
+          id="normalTotoro"
+        />
+        <img
+          src="images/totoro-happy.jpg"
+          alt="Happy Totoro"
+          class="image hidden"
+          id="happyTotoro"
+        />
+      </div>
       <h1 class="question">Jeg er sent ute, vil du være min valentine?</h1>
-      <div class="button-area">
+      <div class="button-section">
         <div class="buttons">
           <button id="yesBtn" onclick="accepted()">Ja</button>
           <button id="noBtn" onclick="rejected()">Nei</button>
         </div>
       </div>
-      <p class="question hidden" id="acceptedMessage">YAY! Send nudes! 🎉❤️</p>
     </div>
     <script src="script.js"></script>
   </body>
