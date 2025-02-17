@@ -78,14 +78,14 @@ button {
 /* Message popup styles */
 .message-popup {
   position: fixed;
-  top: -40px;
+  top: 20%;
   left: 50%;
   transform: translateX(-50%);
   background-color: #ff4081;
   color: white;
-  padding: 10px;
-  border-radius: 5px;
-  font-size: 14px;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 16px;
   opacity: 0;
   transition: opacity 0.3s ease;
   pointer-events: none;
@@ -95,6 +95,18 @@ button {
 
 .message-popup.show {
   opacity: 1;
+}
+
+/* Speech bubble triangle */
+.message-popup::before {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%) rotate(180deg);
+  border-width: 0 10px 10px 10px;
+  border-style: solid;
+  border-color: transparent transparent #ff4081 transparent;
 }
 
 /* Arrow styles */

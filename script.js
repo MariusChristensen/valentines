@@ -8,6 +8,10 @@ const messages = [
   "Okei nå starter jeg å gråte",
   "Jamen bare trykk på ja?",
   "Hallooooooooooooooo",
+  "Nå begynner jeg å bli lei meg 😢",
+  "Er du sikker på at du ikke vil trykke ja?",
+  "HALLOOOOOOOOOOOOOO?????",
+  "Kanskje prøv den store røde knappen i stedet? 🤔",
 ];
 
 function updateEffects() {
@@ -89,33 +93,29 @@ function rejected() {
   noBtn.style.left = `${randomX}px`;
   noBtn.style.top = `${randomY}px`;
 
-  showMessage(noBtn);
+  showMessage();
 }
 
-function showMessage(button) {
-  // Remove existing message if any
+function showMessage() {
   const existingMessage = document.querySelector(".message-popup");
-  if (existingMessage) {
-    existingMessage.remove();
-  }
+  if (existingMessage) existingMessage.remove();
 
-  // Create new message
   const message = document.createElement("div");
   message.className = "message-popup";
   message.textContent =
     messages[Math.min(noClickCount - 1, messages.length - 1)];
 
-  // Position message above button
-  button.appendChild(message);
+  // Add to container instead of Totoro image
+  document.querySelector(".container").appendChild(message);
 
-  // Trigger animation
-  setTimeout(() => message.classList.add("show"), 10);
+  // Force a reflow before adding the show class
+  message.offsetHeight;
+  message.classList.add("show");
 
-  // Remove message after delay
   setTimeout(() => {
     message.classList.remove("show");
     setTimeout(() => message.remove(), 300);
-  }, 1000);
+  }, 2000);
 }
 
 function accepted() {
