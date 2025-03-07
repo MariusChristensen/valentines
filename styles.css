@@ -80,10 +80,13 @@ button:hover {
   background-color: #ff4081;
   color: white;
   position: relative;
+  transition: transform 0.2s ease-in-out;
   transform-origin: center center;
 }
 
 #noBtn {
+  transition: transform 0.3s ease-in-out, left 0.3s ease-in-out,
+    top 0.3s ease-in-out;
   position: relative;
   background-color: #9e9e9e;
   color: white;
